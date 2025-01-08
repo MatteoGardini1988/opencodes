@@ -1,31 +1,37 @@
 import constants as const
 import numpy as np
 import random as rn
+import pandas as pd
 
 
 class SudokuGame:
 
-    def __init__(self, nremove):
+    def __init__(self, nremove=None):
         self.sudomat = const.DEF_VAL * np.ones((const.SUDO_DIM, const.SUDO_DIM))
+        
+        if nremove is not None:
+            assert nremove.isnumeric(), "You have to insert an integer"
+            nremove = int(nremove)
+            assert nremove <= const.SUDO_DIM**2, f"You can remove maximum {const.SUDO_DIM**2} elements"
 
-        assert nremove.isnumeric(), "You have to insert an integer"
-        nremove = int(nremove)
-        assert nremove <= const.SUDO_DIM**2, f"You can remove maximum {const.SUDO_DIM**2} elements"
-
-        # Prepare a valid sudoku matrix
-        r_start = rn.randint(0, const.SUDO_DIM**2)
-        c_start = rn.randint(0, const.SUDO_DIM**2)
-        self.__fill(r_start, c_start)
-        # self.__sudostartingmatrix = self.sudomat
+            # Prepare a valid sudoku matrix
+            r_start = rn.randint(0, const.SUDO_DIM**2)
+            c_start = rn.randint(0, const.SUDO_DIM**2)
+            self.__fill(r_start, c_start)
+            # self.__sudostartingmatrix = self.sudomat
 
 
-        # Sample some elements to remove
-        to_rem = rn.sample(range(const.SUDO_DIM**2), nremove)
+            # Sample some elements to remove
+            to_rem = rn.sample(range(const.SUDO_DIM**2), nremove)
 
-        for elem in to_rem:
-            r = elem//const.SUDO_DIM
-            c = (elem - const.SUDO_DIM*r) - 1
-            self.sudomat[r, c] = const.DEF_VAL
+            for elem in to_rem:
+                r = elem//const.SUDO_DIM
+                c = (elem - const.SUDO_DIM*r) - 1
+                self.sudomat[r, c] = const.DEF_VAL
+
+    def sudoku_read(self, filename):
+        # Read a sudoku from a csv file
+        self.sudomat = pd.read_csv(filename, header=None).values
 
     def sudoku_solve(self):
         [rn, cn] = self.__emptynext()
